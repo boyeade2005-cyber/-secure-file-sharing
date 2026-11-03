@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  files     File[]
+  shares    Share[]
+  accessLogs AccessLog[]
+}
+
+model File {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fileName     String
+  originalName String
+  fileSize     Int
+  mimeType     String
+  encryptionKey String
+  iv           String
+  storagePath  String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  shares       Share[]
+  accessLogs   AccessLog[]
+}
+
+model Share {
+  id          String   @id @default(cuid())
+  fileId      String
+  file        File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shareToken  String   @unique
+  password    String?
+  expiresAt   DateTime?
+  maxDownloads Int     @default(0)
+  downloadCount Int    @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  accessLogs  AccessLog[]
+}
+
+model AccessLog {
+  id        String   @id @default(cuid())
+  fileId    String
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  shareId   String?
+  share     Share?   @relation(fields: [shareId], references: [id], onDelete: SetNull)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  ipAddress String?
+  userAgent String?
+  action    String
+  createdAt DateTime @default(now())
+}

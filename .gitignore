@@ -33,6 +33,17 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# file uploads
+/uploads
+/prisma/*.db
+/prisma/*.db-journal
+
+# AI skills (auto-generated)
+/.agents
+/.claude
+/.cursor
+/.devin
+
 # vercel
 .vercel
 
